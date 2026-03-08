@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reachin | Professional On-Demand Mechanics</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+<style>
+/* ================= NEW MODERN UI SYSTEM ================= */
+:root {
+  --primary: #FF8C00;
+  --dark-bg: #0A0A0B;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --text-main: #FFFFFF;
+  --text-dim: #A1A1AA;
+  --glass: rgba(255, 255, 255, 0.03);
+  --yellow-glow: 0 10px 30px rgba(255, 140, 0, 0.2);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body { 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    background-color: var(--dark-bg); 
+    color: var(--text-main); 
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism Header */
+header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    padding: 20px 5%; 
+    background: rgba(10, 10, 11, 0.8);
+    /* Safari aur purane iOS versions ke liye */
+    -webkit-backdrop-filter: blur(12px); 
+    
+    /* Standard modern browsers ke liye */
+    backdrop-filter: blur(12px);
+    position: fixed; width: 100%; top: 0; z-index: 1000;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    width: 100%;
+    height: 100px;
+}
+
+.logo img { height: 90px; width: 68px; filter: brightness(1.2); }
+
+nav ul { display: flex; gap: 30px; list-style: none; align-items: center; }
+nav ul li a { color: var(--text-dim); text-decoration: none; font-weight: 600; transition: 0.3s; font-size: 0.95rem; }
+nav ul li a:hover { color: var(--primary); }
+
+/* Hero Section */
+.hero {
+    position: relative; height: 100vh; display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 0 20px; overflow: hidden;
+}
+
+.video-container {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+}
+.video-container video { width: 100%; height: 100%; object-fit: cover; opacity: 0.4; }
+.hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 20%, var(--dark-bg) 80%); }
+
+.hero-content { position: relative; z-index: 10; max-width: 900px; }
+.hero-content h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 20px; letter-spacing: -2px; }
+.hero-content p { color: var(--text-dim); font-size: 1.2rem; margin-bottom: 40px; max-width: 600px; margin-inline: auto; }
+
+/* Premium Buttons */
+.btn-group { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+.btn { 
+    padding: 16px 32px; border-radius: 12px; font-weight: 700; text-decoration: none; 
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+.btn-primary { background: var(--primary); color: white; box-shadow: 0 10px 20px rgba(255, 140, 0, 0.3); }
+.btn-outline { border: 1px solid rgba(255,255,255,0.2); color: white; background: var(--glass); }
+.btn:hover { transform: translateY(-5px); }
+
+/* Spiral Elements */
+.spiral-bg {
+    position: fixed; width: 100%; height: 100%; pointer-events: none; z-index: -1;
+}
+.floating-icon {
+    position: absolute; width: 50px; height: 50px; background: var(--glass);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+    animation: float 6s infinite ease-in-out;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-20px) rotate(10deg); }
+}
+
+/* Sections */
+section { padding: 100px 5%; }
+.section-title { text-align: center; margin-bottom: 60px; }
+.section-title h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; }
+.section-title p { color: var(--text-dim); }
+
+/* Grid & Cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+.card { 
+    background: var(--glass); border: 1px solid rgba(255,255,255,0.08); 
+    padding: 40px; border-radius: 24px; transition: 0.4s; text-align: left;
+   /* Safari aur purane iOS versions ke liye */
+    -webkit-backdrop-filter: blur(12px); 
+    
+    /* Standard modern browsers ke liye */
+    backdrop-filter: blur(12px);
+}
+.card:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--primary); transform: translateY(-5px); box-shadow: var(--yellow-glow); }
+.card i { font-size: 40px; color: var(--primary); margin-bottom: 25px; display: block; }
+
+/* FAQ Dropdowns */
+.faq-container { max-width: 800px; margin: 0 auto; }
+.faq-item { 
+    background: var(--glass); margin-bottom: 15px; border-radius: 16px; 
+    overflow: hidden; border: 1px solid rgba(255,255,255,0.05); cursor: pointer;
+}
+.faq-header { padding: 20px 25px; display: flex; justify-content: space-between; font-weight: 600; align-items: center; }
+.faq-body { max-height: 0; overflow: hidden; transition: 0.4s; padding: 0 25px; color: var(--text-dim); }
+.faq-item.active .faq-body { max-height: 200px; padding-bottom: 20px; }
+
+footer {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 60px 5% 30px;
+    background-color: #050506; /* Dark consistent background */
+}
+
+.footer-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* 3-Column Layout */
+    gap: 40px;
+    align-items: start;
+}
+
+.footer-heading {
+    color: var(--primary);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.footer-brand {
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.footer-text {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.8;
+}
+
+/* Map Styling */
+.footer-map {
+    text-align: center;
+}
+
+.footer-map iframe {
+    width: 100%;
+    max-width: 320px;
+    height: 160px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Social Icons Styling */
+.footer-social {
+    text-align: right;
+}
+
+.social-icons {
+    display: flex;
+    gap: 20px;
+    justify-content: flex-end;
+}
+
+.social-icons i {
+    color: var(--text-dim);
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.social-icons i:hover {
+    color: var(--primary) !important;
+    transform: translateY(-8px) scale(1.2);
+    text-shadow: 0 5px 15px rgba(255, 140, 0, 0.6);
+}
+
+/* Bottom Bar */
+.footer-bottom {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.footer-bottom p {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+/* Mobile Responsive */
+@media (max-width: 992px) {
+    .footer-main {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .footer-social, .social-icons, .footer-map {
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    nav { display: none; }
+    .hero-content h1 { font-size: 3rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="spiral-bg">
+    <div class="floating-icon" alt="🔧" style="top: 20%; left: 10%;">🔧</div>
+    <div class="floating-icon" alt="🏍️" style="top: 60%; right: 15%; animation-delay: 2s;">🏍️</div>
+    <div class="floating-icon" alt="📍" style="bottom: 20%; left: 20%; animation-delay: 4s;">📍</div>
+</div>
+
+<header>
+    <div class="logo"><img src="images/reachin_logo5.png" alt="Reachin"></div>
+    <nav>
+        <ul>
+            <li><a href="#how">How it works</a></li>
+            <li><a href="#mechanic-benefits">Benefits</a></li>
+            <li><a href="#partner">For Mechanics</a></li>
+            <li><a href="#safety">Safety</a></li>
+            <li><a href="index.html">User site</a></li>
+        </ul>
+    </nav>
+    <a href="#download" class="btn btn-outline" style="padding: 10px 20px; font-size: 0.8rem;">Get App</a>
+</header>
+
+<section class="hero">
+    <div class="video-container">
+        <video src="images/reachinapp.mp4" autoplay muted loop playsinline></video>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1>Gaadi kharab?<br><span style="color: var(--primary);">Reachin</span> Karo.</h1>
+        <p>Connecting you to the nearest verified mechanic in real-time. Fast, transparent, and always near you.</p>
+        <div class="btn-group">
+            <a href="#" class="btn btn-primary">Book a Mechanic</a>
+            <a href="#" class="btn btn-outline">Join as Partner</a>
+        </div>
+    </div>
+</section>
+
+<section id="how">
+    <div class="section-title">
+        <h2>Smart. Simple. Fast.</h2>
+        <p>How Reachin solves your vehicle troubles in 3 steps</p>
+    </div>
+    <div class="grid">
+        <div class="card">
+            <i class="fas fa-location-arrow"></i>
+            <h3>Set Location</h3>
+            <p>Tell us where you are. We instantly scan for the best mechanics available around your current location.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-user-check"></i>
+            <h3>Verified Match</h3>
+            <p>A professional mechanic accepts your request and reaches you within 15-20 minutes with all tools.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-check-double"></i>
+            <h3>Track & Pay</h3>
+            <p>Track the arrival live. Pay directly via the app once your vehicle is fixed and ready to move.</p>
+        </div>
+    </div>
+</section>
+
+<section id="mechanic-benefits" style="background: rgba(255, 140, 0, 0.02); border-radius: 40px; margin: 0 5%;">
+    <div class="section-title">
+        <h2>Mechanic Partner Benefits</h2>
+        <p>Reachin ke saath judne par aapko milenge ye bade fayde</p>
+    </div>
+    <div class="grid">
+        <div class="card">
+            <i class="fas fa-wallet"></i>
+            <h3>Zyada Kamai</h3>
+            <p>Ab garaj mein baith kar intezar nahi. Direct orders milenge aur aapki daily income 2 guna tak badh sakti hai.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-clock"></i>
+            <h3>Apna Time</h3>
+            <p>Aap jab chahe online aayein aur kaam shuru karein. Reachin par aap apne khud ke boss hain.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-star"></i>
+            <h3>Market Identity</h3>
+            <p>Verified profile ke saath aapko milti hai ek professional digital pehchan aur grahako ka bharosa.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Secure Payment</h3>
+            <p>Kaam khatam hote hi digital payment ka option. Paiso ke liye koi jhik-jhik nahi, seedha account mein.</p>
+        </div>
+    </div>
+</section>
+
+<section id="partner" style="background: rgba(255, 140, 0, 0.03);">
+    <div class="section-title">
+        <h2>Apne Hunar ko Pehchan Do</h2>
+        <p>For Mechanic Partners - Grow your business with Reachin</p>
+    </div>
+    <div class="grid">
+        <div class="card">
+            <i class="fas fa-chart-line"></i>
+            <h3>Direct Access</h3>
+            <p>Grahak ka intezar khatam. Apne mobile par direct orders payein aur apni kamai badhaiye.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-id-badge"></i>
+            <h3>Verified Identity</h3>
+            <p>Hum aapko ek "Verified Expert" ki pehchan dete hain, jisse log aap par zyada bharosa karte hain.</p>
+        </div>
+    </div>
+</section>
+
+<section id="safety">
+    <div class="section-title">
+        <h2>Your Safety is Our Priority</h2>
+        <p>Clear answers to your most important concerns</p>
+    </div>
+    <div class="faq-container">
+        <div class="faq-item" onclick="this.classList.toggle('active')">
+            <div class="faq-header">Mechanic verification process kya hai? <i class="fas fa-plus"></i></div>
+            <div class="faq-body">Hum har mechanic ka ID proof aur unki technical skills ko verify karne ke baad hi unhe onboard karte hain.</div>
+        </div>
+        <div class="faq-item" onclick="this.classList.toggle('active')">
+            <div class="faq-header">Pricing kaise decide hoti hai? <i class="fas fa-plus"></i></div>
+            <div class="faq-body">App par standard pricing di gayi hai. Mechanic ke aane se pehle aapko estimate mil jata hai taaki koi hidden charges na ho.</div>
+        </div>
+        <div class="faq-item" onclick="this.classList.toggle('active')">
+            <div class="faq-header">Kya emergency services 24/7 available hain? <i class="fas fa-plus"></i></div>
+            <div class="faq-body">Ji haan, Reachin network raat ho ya din, hamesha active rehta hai taaki aap raste mein kabhi na fasein.</div>
+        </div>
+    </div>
+</section>
+
+<footer>
+  <div class="footer-main">
+    <div class="footer-details">
+      <h4 class="footer-heading">Company Details</h4>
+      <h3 class="footer-brand">Reachin Pvt Ltd</h3>
+      <p class="footer-text">
+        CIN: U45200BR2025PTC081077<br>
+        Reg No: 081077<br>
+        Patna, Bihar
+      </p>
+    </div>
+
+    <div class="footer-map">
+      <h4 class="footer-heading">Our Location</h4>
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d115132.861072421!2d85.073389!3d25.594095!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39ed5842f03e97ea%3A0x6030fa27214441!2sPatna%2C%20Bihar!5e0!3m2!1sen!2sin!4v1690000000000" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+
+    <div class="footer-social">
+      <h4 class="footer-heading">Social Media</h4>
+      <div class="social-icons">
+        <i class="fab fa-instagram"></i>
+        <i class="fab fa-facebook"></i>
+        <i class="fab fa-linkedin"></i>
+        <i class="fab fa-youtube"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© <span id="year"></span> Reachin Pvt Ltd. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
