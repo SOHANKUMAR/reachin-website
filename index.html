@@ -522,14 +522,18 @@ footer {
 </footer>
 
 <script>
-  // Service Worker Registration (Auto-update ke liye)
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('SW Registered'))
-      .catch(err => console.log('SW Failed', err));
-  });
-}
+// Service Worker Registration (Updated Path)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js') // '/' ki jagah './' use karein
+        .then(reg => {
+          console.log('SW Registered Successfully');
+        })
+        .catch(err => {
+          console.error('SW Registration Failed:', err);
+        });
+    });
+  }
 // Hamburger toggle
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('navMenu');
