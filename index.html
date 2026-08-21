@@ -613,21 +613,22 @@ form.addEventListener('submit', e => {
       return;
   }
   
+  if (errorMsg) errorMsg.style.display = "none";
   btn.disabled = true;
   btn.innerText = "Sending...";
   
   fetch(scriptURL, { 
       method: 'POST', 
-      body: new URLSearchParams(new FormData(form)).toString(),
-      headers: { "Content-Type": "application/x-www-form-urlencoded" }
+      body: new FormData(form),
+      mode: 'no-cors'
   }).then(() => {
       alert("Success!");
       form.reset();
       btn.disabled = false;
       btn.innerText = "Send Message";
-  }).catch(() => {
-      alert("Completed.");
-      form.reset();
+  }).catch((err) => {
+      console.error(err);
+      alert("Error sending message. Please try again.");
       btn.disabled = false;
       btn.innerText = "Send Message";
   });

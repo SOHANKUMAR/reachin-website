@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reachin - Rapido for Mechanics</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --primary: #F0DF20;
+            --dark: #1A1A1A;
+            --gray: #f4f4f4;
+            --white: #ffffff;
+        }
+
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; height: 100%; background: var(--gray); overflow: hidden; }
+
+        /* Header */
+        .app-header {
+            position: absolute;
+            top: 0; width: 100%;
+            background: var(--dark);
+            color: var(--primary);
+            padding: 15px 20px;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Map Container */
+        #map { height: 100%; width: 100%; z-index: 1; }
+
+        /* Bottom UI */
+        .bottom-ui {
+            position: absolute;
+            bottom: 0; width: 100%;
+            background: var(--white);
+            border-radius: 25px 25px 0 0;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+        }
+
+        .drag-handle { width: 40px; height: 5px; background: #ccc; border-radius: 10px; margin: 0 auto 15px; }
+
+        .service-list { margin-bottom: 20px; }
+        .service-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .service-card.active { border-color: var(--primary); background: #fffdf0; }
+        .service-icon { font-size: 24px; margin-right: 15px; background: var(--primary); padding: 10px; border-radius: 10px; }
+        .price { margin-left: auto; font-weight: bold; font-size: 18px; }
+
+        .btn-confirm {
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            width: 100%;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Overlays */
+        .searching-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 2000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .pulse {
+            width: 100px; height: 100px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: ripple 1.5s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        @keyframes ripple {
+            0% { box-shadow: 0 0 0 0 rgba(240, 223, 32, 0.7); }
+            100% { box-shadow: 0 0 0 40px rgba(240, 223, 32, 0); }
+        }
+
+        /* Auth Form Styles */
+        #login-form input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">
+        <div style="font-size: 22px;">REACHIN</div>
+        <div id="location-text" style="font-size: 12px; color: white;">Detecting location...</div>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="bottom-ui" id="main-booking-ui">
+        <div class="drag-handle"></div>
+        <h3 style="margin: 0 0 15px 0;">Mechanic Chahiye?</h3>
+        
+        <div class="service-list">
+            <div class="service-card active" onclick="selectService(this)">
+                <div class="service-icon">🚲</div>
+                <div><strong>Puncture Repair</strong><br><small>Nearby</small></div>
+                <div class="price">₹49</div>
+            </div>
+            <div class="service-card" onclick="selectService(this)">
+                <div class="service-icon">🛠️</div>
+                <div><strong>General Service</strong><br><small>Standard</small></div>
+                <div class="price">₹199</div>
+            </div>
+        </div>
+
+        <button class="btn-confirm" onclick="initiateBooking()">CONFIRM BOOKING</button>
+    </div>
+
+    <div class="searching-overlay" id="loader">
+        <div class="pulse">Reachin</div>
+        <div class="status-msg" style="margin-top:20px; font-weight:bold;">Searching Nearby Mechanics...</div>
+        <button onclick="cancelBooking()" style="margin-top:20px; color:red; border:none; background:none; cursor:pointer;">CANCEL</button>
+    </div>
+
+    <div id="auth-overlay" class="searching-overlay" style="background: white; padding: 20px;">
+        <h2 style="color: var(--dark);">Pehle Login Karein</h2>
+        <p>Booking ke liye Details zaroori hain.</p>
+        <div id="login-form" style="width: 100%; max-width: 300px;">
+            <input type="text" id="user-name" placeholder="Apna Poora Naam">
+            <input type="tel" id="user-phone" placeholder="Mobile Number" maxlength="10">
+            <button class="btn-confirm" onclick="handleAuth()">SIGN UP / LOGIN</button>
+            <button onclick="closeAuth()" style="margin-top:15px; border:none; background:none; color:gray;">Back</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // 1. Setup Map
+        var map = L.map('map', { zoomControl: false }).setView([26.8467, 80.9462], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        var userIcon = L.circleMarker([26.8467, 80.9462], {
+            radius: 10, fillColor: "#F0DF20", color: "#000", weight: 2, fillOpacity: 0.8
+        }).addTo(map);
+
+        var mechanicMarker = L.marker([0, 0], {
+            icon: L.icon({
+                iconUrl: 'https://cdn-icons-png.flaticon.com/512/71/71422.png',
+                iconSize: [30, 30]
+            })
+        }).addTo(map);
+
+        // 2. Location Tracking
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(pos => {
+                var lat = pos.coords.latitude;
+                var lng = pos.coords.longitude;
+                map.setView([lat, lng], 15);
+                userIcon.setLatLng([lat, lng]);
+                document.getElementById('location-text').innerText = "Live Location Active";
+            });
+        }
+
+        // 3. Auth Logic
+        function checkUserStatus() {
+            const data = localStorage.getItem('reachin_user');
+            return data ? JSON.parse(data) : null;
+        }
+
+        function initiateBooking() {
+            if (!checkUserStatus()) {
+                document.getElementById('auth-overlay').style.display = 'flex';
+            } else {
+                proceedToSearch();
+            }
+        }
+
+        function handleAuth() {
+            const name = document.getElementById('user-name').value;
+            const phone = document.getElementById('user-phone').value;
+            if (name.length < 3 || phone.length < 10) {
+                alert("Sahi details bharein!");
+                return;
+            }
+            localStorage.setItem('reachin_user', JSON.stringify({name, phone}));
+            document.getElementById('auth-overlay').style.display = 'none';
+            proceedToSearch();
+        }
+
+        // 4. Booking & Tracking Logic
+        let mLat = 26.8500, mLng = 80.9500;
+
+        function proceedToSearch() {
+            document.getElementById('loader').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                mechanicMarker.setLatLng([mLat, mLng]);
+                const user = checkUserStatus();
+                alert(`Mechanic mil gaya! Amit aapke number ${user.phone} par call karega.`);
+                startTracking();
+            }, 3000);
+        }
+
+        function startTracking() {
+            setInterval(() => {
+                mLat -= 0.0002; mLng -= 0.0002;
+                mechanicMarker.setLatLng([mLat, mLng]);
+                if (map.distance(userIcon.getLatLng(), mechanicMarker.getLatLng()) < 50) {
+                    alert("Mechanic pahunch gaya hai!");
+                }
+            }, 5000);
+        }
+
+        function selectService(el) {
+            document.querySelectorAll('.service-card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function closeAuth() { document.getElementById('auth-overlay').style.display = 'none'; }
+        function cancelBooking() { document.getElementById('loader').style.display = 'none'; }
+    </script>
+</body>
+</html>
