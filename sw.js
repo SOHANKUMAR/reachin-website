@@ -1,4 +1,4 @@
-const CACHE_NAME = 'reachin-cache-v1';
+const CACHE_NAME = 'reachin-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -12,6 +12,7 @@ const ASSETS_TO_CACHE = [
 
 // Service Worker Install hone par files cache karega
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('Caching shell assets');
@@ -27,12 +28,21 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
 // Offline support ke liye fetch event
 self.addEventListener('fetch', (event) => {
+  // Non-GET requests aur Google Script/IP APIs ko direct network pe jane dein
+  if (
+    event.request.method !== 'GET' ||
+    event.request.url.includes('script.google.com') ||
+    event.request.url.includes('ipapi.co')
+  ) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cacheRes) => {
       return cacheRes || fetch(event.request);
