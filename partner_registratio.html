@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reachin - Mechanic Partner Registration</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    :root { --primary: #0f52ba; --dark: #1e293b; --light: #f8fafc; --border: #cbd5e1; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+    body { background: #f1f5f9; padding: 20px 10px; color: var(--dark); }
+    .container { max-width: 650px; background: #ffffff; margin: 0 auto; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); overflow: hidden; }
+    .header { background: var(--primary); color: #fff; padding: 24px 20px; text-align: center; }
+    .header h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
+    .header p { font-size: 13px; opacity: 0.9; margin-top: 6px; }
+    form { padding: 25px 20px; }
+    .section-title { font-size: 15px; font-weight: 700; color: var(--primary); margin: 20px 0 12px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #334155; }
+    input, select, textarea { width: 100%; padding: 10px 12px; font-size: 14px; border: 1px solid var(--border); border-radius: 6px; outline: none; transition: border-color 0.2s; }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .geo-btn { background: #e0e7ff; color: var(--primary); border: 1px solid #c7d2fe; padding: 10px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .geo-btn:hover { background: #c7d2fe; }
+    .payment-summary { background: #eff6ff; border: 1px dashed var(--primary); padding: 16px; border-radius: 8px; margin: 20px 0; text-align: center; }
+    .payment-summary h3 { font-size: 18px; color: var(--primary); margin-bottom: 4px; }
+    .payment-summary p { font-size: 12px; color: #64748b; }
+    .btn-submit { width: 100%; background: #16a34a; color: #fff; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn-submit:hover { background: #15803d; }
+    .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
+    #statusOverlay { display: none; text-align: center; padding: 40px 20px; }
+    .receipt-box { border: 2px dashed #16a34a; background: #f0fdf4; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: left; }
+    .receipt-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid #dcfce7; }
+    @media (max-width: 480px) { .grid-2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>REACHIN PARTNER NETWORK</h1>
+    <p>Official Mechanic Onboarding & KYC Registration</p>
+  </div>
+
+  <form id="onboardingForm">
+    
+    <!-- 1. Employee Association -->
+    <div class="section-title">1. Executive Referral Details</div>
+    <div class="form-group">
+      <label>Onboarded By (Employee ID / Name) *</label>
+      <input type="text" id="employeeId" placeholder="e.g. RCH-EMP-101 ya Direct" required>
+    </div>
+
+    <!-- 2. Personal & Workshop Details -->
+    <div class="section-title">2. Mechanic Profile & Workshop</div>
+    <div class="form-group">
+      <label>Mechanic Full Name *</label>
+      <input type="text" id="mechanicName" placeholder="Aadhaar ke anusaar" required>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Mobile Number (WhatsApp) *</label>
+        <input type="tel" id="mobile" pattern="[0-9]{10}" placeholder="10-digit number" required>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="mechanic@email.com">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Vehicle Specialization *</label>
+        <select id="vehicleType" required>
+          <option value="">Select Category</option>
+          <option value="Bike Specialist (2-Wheeler)">Bike Specialist (2-Wheeler)</option>
+          <option value="Car Specialist (4-Wheeler)">Car Specialist (4-Wheeler)</option>
+          <option value="Both (Car & Bike)">Both (Car & Bike)</option>
+          <option value="EV Specialist">EV Specialist</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Live Workshop Location *</label>
+        <button type="button" class="geo-btn" onclick="captureLocation()">📍 Lock Live GPS</button>
+      </div>
+    </div>
+    <input type="hidden" id="locationLink" required>
+    <div id="locStatus" style="font-size: 11px; color: #16a34a; margin-top: -8px; margin-bottom: 10px;"></div>
+
+    <div class="form-group">
+      <label>Complete Workshop Address *</label>
+      <textarea id="address" rows="2" placeholder="Gali, Mohalla, Landmark, City, Pincode" required></textarea>
+    </div>
+
+    <!-- 3. Identification & Bank Details -->
+    <div class="section-title">3. Identity & Banking Details</div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Aadhaar Number *</label>
+        <input type="text" id="aadhaarNo" pattern="[0-9]{12}" placeholder="12 digit Aadhaar" required>
+      </div>
+      <div class="form-group">
+        <label>PAN Card Number *</label>
+        <input type="text" id="panNo" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" placeholder="ABCDE1234F" style="text-transform: uppercase;" required>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Bank Account Number *</label>
+        <input type="text" id="bankAcc" placeholder="Account Number" required>
+      </div>
+      <div class="form-group">
+        <label>IFSC Code *</label>
+        <input type="text" id="bankIfsc" placeholder="e.g. SBIN0001234" style="text-transform: uppercase;" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Account Holder Name (As per Passbook) *</label>
+      <input type="text" id="bankHolder" placeholder="Account holder name" required>
+    </div>
+
+    <!-- 4. Mandatory Document Uploads -->
+    <div class="section-title">4. Document & Photo Uploads</div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Mechanic Passport Photo *</label>
+        <input type="file" id="photoFile" accept="image/*" required>
+      </div>
+      <div class="form-group">
+        <label>Shop Front / Garage Photo *</label>
+        <input type="file" id="shopFile" accept="image/*" required>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Aadhaar Card (Front/Back) *</label>
+        <input type="file" id="aadhaarFile" accept="image/*,.pdf" required>
+      </div>
+      <div class="form-group">
+        <label>PAN Card Copy *</label>
+        <input type="file" id="panFile" accept="image/*,.pdf" required>
+      </div>
+    </div>
+
+    <!-- 5. Payment Section -->
+    <div class="payment-summary">
+      <p>Onboarding & Verification Fee</p>
+      <h3 id="feeDisplay">₹500.00</h3>
+      <p>Instant activation through Razorpay Payment Gateway</p>
+    </div>
+
+    <button type="submit" id="submitBtn" class="btn-submit">Proceed to Pay & Register</button>
+  </form>
+
+  <!-- Success Confirmation Screen -->
+  <div id="statusOverlay">
+    <h2 style="color: #16a34a; font-size: 22px;">Registration Successful!</h2>
+    <p style="color: #64748b; font-size: 14px; margin-top: 4px;">Mechanic partner profile activated in Reachin Network.</p>
+    
+    <div class="receipt-box">
+      <div class="receipt-row"><span>Mechanic ID:</span> <b id="outMechId" style="color: var(--primary);"></b></div>
+      <div class="receipt-row"><span>Mechanic Name:</span> <b id="outName"></b></div>
+      <div class="receipt-row"><span>Payment ID:</span> <b id="outPayId"></b></div>
+      <div class="receipt-row"><span>Status:</span> <b style="color: #16a34a;">VERIFIED & ACTIVE</b></div>
+    </div>
+
+    <button onclick="window.print()" style="margin-top: 20px; padding: 10px 20px; background: var(--dark); color: #fff; border: none; border-radius: 6px; cursor: pointer;">Print Receipt</button>
+  </div>
+</div>
+
+<script>
+  // Configuration Settings
+  const APPS_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+  const RAZORPAY_KEY = "YOUR_RAZORPAY_KEY_ID"; // Format: rzp_test_xxx ya rzp_live_xxx
+  const REGISTRATION_FEE_INR = 500; 
+
+  // Capture Live Geolocation
+  function captureLocation() {
+    const locStatus = document.getElementById("locStatus");
+    if (!navigator.geolocation) {
+      alert("Aapke browser me Geolocation support nahi hai.");
+      return;
+    }
+    locStatus.innerText = "Fetching coordinates...";
+    locStatus.style.color = "#d97706";
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const link = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+        document.getElementById("locationLink").value = link;
+        locStatus.innerText = `✓ GPS Locked (${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)})`;
+        locStatus.style.color = "#16a34a";
+      },
+      () => {
+        locStatus.innerText = "Location access denied. Please enable GPS.";
+        locStatus.style.color = "#dc2626";
+        alert("Live location zaroori hai breakdown calls route karne ke liye.");
+      },
+      { enableHighAccuracy: true }
+    );
+  }
+
+  // Base64 File Parser
+  const fileToBase64 = file => new Promise((resolve, reject) => {
+    if (!file) return resolve(null);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve({
+      fileName: file.name,
+      mimeType: file.type,
+      base64: reader.result.split(',')[1]
+    });
+    reader.onerror = error => reject(error);
+  });
+
+  // Form Submission & Razorpay Trigger
+  document.getElementById("onboardingForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    if (!document.getElementById("locationLink").value) {
+      alert("Kripya pehle 'Lock Live GPS' button par click karke shop location lock karein.");
+      return;
+    }
+
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Opening Payment Gateway...";
+
+    const mechName = document.getElementById("mechanicName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const mobile = document.getElementById("mobile").value.trim();
+
+    // Razorpay Integration
+    const options = {
+      "key": RAZORPAY_KEY,
+      "amount": REGISTRATION_FEE_INR * 100, // paise
+      "currency": "INR",
+      "name": "Reachin Vehicle Assistance",
+      "description": "Mechanic Partner Onboarding Fee",
+      "prefill": {
+        "name": mechName,
+        "email": email,
+        "contact": mobile
+      },
+      "theme": { "color": "#0f52ba" },
+      "handler": async function (paymentResponse) {
+        submitBtn.innerText = "Finalizing Registration...";
+
+        try {
+          // Process files in parallel
+          const [photo, shop, aadhaar, pan] = await Promise.all([
+            fileToBase64(document.getElementById("photoFile").files[0]),
+            fileToBase64(document.getElementById("shopFile").files[0]),
+            fileToBase64(document.getElementById("aadhaarFile").files[0]),
+            fileToBase64(document.getElementById("panFile").files[0])
+          ]);
+
+          const payload = {
+            action: "register_mechanic",
+            employeeId: document.getElementById("employeeId").value.trim(),
+            name: mechName,
+            mobile: mobile,
+            email: email,
+            vehicleType: document.getElementById("vehicleType").value,
+            locationLink: document.getElementById("locationLink").value,
+            address: document.getElementById("address").value.trim(),
+            aadhaarNo: document.getElementById("aadhaarNo").value.trim(),
+            panNo: document.getElementById("panNo").value.trim(),
+            bankHolder: document.getElementById("bankHolder").value.trim(),
+            bankAcc: document.getElementById("bankAcc").value.trim(),
+            bankIfsc: document.getElementById("bankIfsc").value.trim(),
+            paymentId: paymentResponse.razorpay_payment_id,
+            photo: photo,
+            shopPhoto: shop,
+            aadhaarFile: aadhaar,
+            panFile: pan
+          };
+
+          const res = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify(payload)
+          });
+          const result = await res.json();
+
+          if (result.status === "success") {
+            document.getElementById("onboardingForm").style.display = "none";
+            document.getElementById("statusOverlay").style.display = "block";
+            document.getElementById("outMechId").innerText = result.mechanicId;
+            document.getElementById("outName").innerText = mechName;
+            document.getElementById("outPayId").innerText = paymentResponse.razorpay_payment_id;
+          } else {
+            throw new Error(result.message);
+          }
+        } catch (err) {
+          alert("Data log error: " + err.message);
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Retry Submission";
+        }
+      },
+      "modal": {
+        "ondismiss": function() {
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Proceed to Pay & Register";
+        }
+      }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+  });
+</script>
+
+</body>
+</html>
